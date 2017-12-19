@@ -1,10 +1,10 @@
-#ifndef __DRV_CC1101_H__
+﻿#ifndef __DRV_CC1101_H__
 #define __DRV_CC1101_H__
 
 #include <Arduino.h>
 #include "drv_CC1101_Reg.h"
 
-
+//重新添加的 对比
 #define TRUE  1
 #define FALSE 0
 const uint8_t PaTabel[] = { 0xc0, 0xC8, 0x84, 0x60, 0x68, 0x34, 0x1D, 0x0E, 0x12};//9

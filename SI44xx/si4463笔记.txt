@@ -1,0 +1,163 @@
+
+以下是一些建筑材料衰减损耗的经验数据：?
+混凝土墙：13~18dB????????空心砌砖墙：4~6dB?简易石膏板墙：3~5dB????????普通玻璃门窗：2~4dB?镀膜玻璃门窗：12~15dB?
+木门：3~5dB????????金属板房及门：12~15dB
+无线通信距离的计算?这里给出自由空间传播时的无线通信距离的计算方法：所谓自由空间传播?系指天线周围为无限大真空时的电波传播，它是理想传播条件。电波在自由空?间传播时，其能量既不会被障碍物所吸收，也不会产生反射或散射。?通信距离与发射功率、接收灵敏度和工作频率有关。
+
+[Lfs](dB)=32.44+20lgd(km)+20lgf(MHz)
+式中Lfs?为传输损耗，d?为传输距离，频率的单位MHz?计算。?由上式可见，自由空间中电波传播损耗(亦称衰减)只与工作频率f?和传播?距离d?有关，当f?增大一倍时，[Lfs]将分别增加6dB.下面的公式说明在自由空间下电波传播的损耗?Los=32.44+20lg?d(Km)+20lg?f(MHz)?Los?是传播损耗，单位为dB?是工作频率，单位是MHz?
+下式为无线信号在空气中传输时的损耗计算公式：?Los?=?32.44?+?20lg?d(Km)?+?20lg?f(MHz)
+匹配功能
+如果有需要应该打开匹配中断
+#define RF_INT_CTL_ENABLE_4 0x11, 0x01, 0x04, 0x00, 0x07, 0x98, 0x01, 0x08
+#define RF_MATCH_VALUE_1_12 0x11, 0x30, 0x0C, 0x00, 0x31, 0xFF, 0x40, 0x32, 0xFF, 0x05, 0x33, 0xFF, 0x08, 0x34, 0xFF, 0x0B
+可以单独使用一个match，但是超过一个时必须保证正确配置所有，该匹配功能目前发现只能在固定数据包长度的形式下使用，否则将无法收取到接收中断。
+
+//设置中断 为保证精确在检测到同步字之后立即读取rssi 
+//接收必须重新进入状态，清空RXFiFO
+//#define RF_INT_CTL_ENABLE_4 0x11, 0x01, 0x04, 0x00, 0x07, 0xB0, 0x19, 0x00
+//配置rssi读取方式 锁存方式
+//#define RF_MODEM_RSSI_CONTROL_1 0x11, 0x20, 0x01, 0x4C, 0x02
+
+
+前导字超时跳频配置：
+/*
+// Set properties:           RF_PREAMBLE_CONFIG_STD_2_2
+// Number of properties:     2
+// Group ID:                 0x10
+// Start ID:                 0x03
+// Default values:           0x0F, 0x21, 
+// Descriptions:
+//   PREAMBLE_CONFIG_STD_2 - Configuration of timeout periods during reception of a packet with Standard Preamble pattern.
+//   PREAMBLE_CONFIG - General configuration bits for the Preamble field.
+*/
+#define RF_PREAMBLE_CONFIG_STD_2_2 0x11, 0x10, 0x02, 0x03, 0x0F, 0x31
+
+超时字长相关配置
+
+
+/*
+// Set properties:           RF_RX_HOP_CONTROL_12
+// Number of properties:     12
+// Group ID:                 0x50
+// Start ID:                 0x00
+// Default values:           0x04, 0x01, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 
+// Descriptions:
+//   RX_HOP_CONTROL - Configuration options for the automatic RX Hop functionality.
+//   RX_HOP_TABLE_SIZE - Specifies the number of entries (channels) in the RX Hop table.
+//   RX_HOP_TABLE_ENTRY_0 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_1 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_2 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_3 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_4 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_5 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_6 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_7 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_8 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_9 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_CONTROL_12 0x11, 0x50, 0x0C, 0x00, 0x10, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0xFF
+
+/*
+// Set properties:           RF_RX_HOP_TABLE_ENTRY_10_12
+// Number of properties:     12
+// Group ID:                 0x50
+// Start ID:                 0x0C
+// Default values:           0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 
+// Descriptions:
+//   RX_HOP_TABLE_ENTRY_10 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_11 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_12 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_13 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_14 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_15 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_16 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_17 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_18 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_19 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_20 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_21 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_TABLE_ENTRY_10_12 0x11, 0x50, 0x0C, 0x0C, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+
+/*
+// Set properties:           RF_RX_HOP_TABLE_ENTRY_22_12
+// Number of properties:     12
+// Group ID:                 0x50
+// Start ID:                 0x18
+// Default values:           0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1E, 0x1F, 0x20, 0x21, 
+// Descriptions:
+//   RX_HOP_TABLE_ENTRY_22 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_23 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_24 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_25 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_26 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_27 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_28 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_29 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_30 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_31 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_32 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_33 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_TABLE_ENTRY_22_12 0x11, 0x50, 0x0C, 0x18, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+
+/*
+// Set properties:           RF_RX_HOP_TABLE_ENTRY_34_12
+// Number of properties:     12
+// Group ID:                 0x50
+// Start ID:                 0x24
+// Default values:           0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 
+// Descriptions:
+//   RX_HOP_TABLE_ENTRY_34 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_35 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_36 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_37 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_38 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_39 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_40 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_41 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_42 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_43 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_44 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_45 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_TABLE_ENTRY_34_12 0x11, 0x50, 0x0C, 0x24, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+
+/*
+// Set properties:           RF_RX_HOP_TABLE_ENTRY_46_12
+// Number of properties:     12
+// Group ID:                 0x50
+// Start ID:                 0x30
+// Default values:           0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 
+// Descriptions:
+//   RX_HOP_TABLE_ENTRY_46 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_47 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_48 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_49 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_50 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_51 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_52 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_53 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_54 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_55 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_56 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_57 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_TABLE_ENTRY_46_12 0x11, 0x50, 0x0C, 0x30, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+
+/*
+// Set properties:           RF_RX_HOP_TABLE_ENTRY_58_6
+// Number of properties:     6
+// Group ID:                 0x50
+// Start ID:                 0x3C
+// Default values:           0x3A, 0x3B, 0x3C, 0x3D, 0x3E, 0x3F, 
+// Descriptions:
+//   RX_HOP_TABLE_ENTRY_58 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_59 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_60 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_61 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_62 - Defines entries in the RX Hopping Table (N=0 to 63)
+//   RX_HOP_TABLE_ENTRY_63 - Defines entries in the RX Hopping Table (N=0 to 63)
+*/
+#define RF_RX_HOP_TABLE_ENTRY_58_6 0x11, 0x50, 0x06, 0x3C, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
